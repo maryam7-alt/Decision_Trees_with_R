@@ -1,0 +1,80 @@
+
+
+#Building a decision Tree.  
+
+#import the dataset 
+
+library(datasets)
+data= iris
+
+#Analyze the dataset 
+#you can get rid off null values
+
+View(data)
+
+#split the dataset into training and testing
+ind<-sample(2,nrow(data),TRUE,prob = c(0.6,0.4))
+
+train_set = iris[ind==1,]
+test_set = iris[ind==2,]
+
+#Build our decision tree 
+library(nnet)
+library(rpart)
+library(rpart.plot)
+tree_nnet<-nnet(Species~.,data = train_set,size=5)
+tree_rpart<-rpart(Species~.,data = train_set)
+tree
+
+
+#plot the tree
+library("rpart.plot")
+
+rpart.plot(tree_rpart)
+
+
+#Predict 
+pred_nnet <- predict(tree_nnet,test_set)
+pred<-predict(tree_rpart,test_set)
+pred
+pred_nnet
+
+
+#A function we need here 
+
+assignspecies<- function(p1,p2,p3)
+{
+  m=max(p1,p2,p3)
+  if(m==p1) return ('setosa')
+  else if(m==p2) return ('versicolor')
+  else return ('virginica')
+  
+  
+} 
+
+assignspecies(0.2,0.6,0.2)
+
+#prediction after factoring 
+
+pred2 <-NULL
+for(i in 1:nrow(pred_nnet))
+{
+  pred2<- c(pred2,assignspecies(pred_nnet[i,1],pred_nnet[i,2],pred_nnet[i,3]))
+}
+
+pred2
+
+
+
+#confusion matrix 
+
+#weird error
+pred<-as.factor(pred2)
+conf<-table(pred,test_set$Species)
+conf
+
+#Acuuracy 
+
+acc <- (conf[1,1]+conf[2,2]+conf[3,3])/sum(conf)
+
+
