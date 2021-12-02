@@ -46,8 +46,19 @@ subtree
 Leaf/Terminal node 
 
 
-Recrusive binary splitting : 
-* top down and greedy : it starts at the toop of the tree and then succesively splits the predictor space and greedy because at each step of the tree-building process, the best split is made at that particular step. 
+# Recrusive binary splitting : 
+* top down and greedy : it starts at the toop of the tree and then succesively splits the predictor space and greedy because at each step of the tree-building process, the best split is made at that particular step.  
+
+
+# Steps:  
+* Consider all predictors and all possible cut point values 
+* We calculate the RSS 
+* We select the one with least RSS 
+* Continues till stopping criteria is reached
+
+We choose the output that will maximize information gain.
+Information gain = Entropy before splitting - Entry after splitting
+The more pure the nodes are the less id the gini index(impurity index)
 
 #This is our Tree with package rpart: 
 
