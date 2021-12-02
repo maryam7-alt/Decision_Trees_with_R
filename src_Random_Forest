@@ -1,1 +1,69 @@
 
+
+#Building a random forest 
+
+#load the dataset 
+
+titanic<-read.csv("titanic.csv")
+
+#clean it
+titanic$Survived<- factor(titanic$Survived)
+titanic$Pclass<-factor(titanic$Pclass)
+titanic$Sex<-factor(titanic$Sex)
+titanic$Embarked<-factor(titanic$Embarked)
+
+#Remove passengers that do not have an age
+nul<- !is.na(titanic$Age)
+titanic<-titanic[nul,]
+
+
+#we want to classify age by age_group
+
+Classifyage<-function(age){
+  
+  if(age <=15) return("child")
+  else if (age <=60) return("Adult")
+  else return("old")
+}
+
+#now let's assign it to the dataset 
+
+#we will make a new coloumn 
+
+Agegroup<- c()
+for(i in 1:nrow(titanic))
+{
+  Agegroup<- c(Agegroup, Classifyage(titanic[i,"Age"]))
+}
+
+titanic$Agegroup <- as.factor(Agegroup)
+titanic$Cabin <-substr(titanic$Cabin,1,1)
+for (i in 1:nrow(titanic))
+{
+  if (titanic[i,"Cabin"]=="") titanic[i,"Cabin"]="X"
+}
+
+#Split the dataset 
+library(randomForest)
+ind<-sample(2,nrow(titanic),TRUE,prob = c(0.6,0.4))
+
+train_set = titanic[ind==1,]
+test_set = titanic[ind==2,]
+formula <- Survived~Pclass+Sex+Agegroup+Cabin+Embarked 
+rf<-randomForest(formula,data=train_set,importance = T)
+rf
+rfconf <-rf$confusion
+
+accuracy <-sum(diag(rfconf))/sum(rfconf)
+#Create the trees 
+
+#predict 
+pred <-predict(rf,test_set)
+sum(rfconf)
+
+#Evaluate accuracy 
+
+imp<-rf$importance
+
+hist(imp,rf$mtry,xlab=c("Classes"))
+#Tuning 
